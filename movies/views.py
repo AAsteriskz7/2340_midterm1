@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
+from cart.models import Item
+import json
 
 def index(request):
     search_term = request.GET.get('search')
@@ -69,3 +71,51 @@ def report_review(request, id, review_id):
         review.save()
         # review.delete()
     return redirect('movies.show', id=id)
+
+def popularity_map(request):
+    items = Item.objects.select_related('order__user__profile', 'movie').all()
+
+    trending_data = {}
+    for item in items:
+        try:
+            region = item.order.user.profile.region.lower() 
+        except Exception:
+            region = 'southeast'
+
+        if region not in trending_data:
+            trending_data[region] = {}
+
+        movie_name = item.movie.name
+        if movie_name not in trending_data[region]:
+            trending_data[region][movie_name] = 0
+
+        trending_data[region][movie_name] += item.quantity
+
+    coords = {
+        'northeast': [40.8781, -77.7996], 
+        'southeast': [33.9169, -80.8964],             
+        'midwest': [40.0417, -89.1965],             
+        'southwest': [34.2744, -111.6602],             
+        'west': [43.9336, -120.5583]
+    }
+
+    map_data=[]
+    for region, movies_dict in trending_data.items():
+        sorted_movies = sorted(movies_dict.items(), key=lambda x: x[1], reverse=True)
+        top_movies =  sorted_movies[:3]
+
+        movies_str =  ", ".join([f"{name} ({count} purchases)" for name, count in top_movies])
+
+        lat, lng = coords.get(region, [0,0])
+
+        if lat != 0:
+            display_name = region.capitalize()
+
+            map_data.append({
+                'region': display_name,
+                'lat': lat,
+                'lng': lng,
+                'trending': movies_str
+            })
+    map_data_json = json.dumps(map_data)
+    return render(request, 'movies/popularity_map.html', {'map_data_json': map_data_json})

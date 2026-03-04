@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<div class="container mt-4">
+    <h2>Local Popularity Map</h2>
+    <p>Discover what movies are trending around the country!</p>
+
+    <div id="map" style="height: 500px; width: 100%; border-radius: 8px;"></div>
+    
+    <div id="region-info" class="mt-4 p-3 bg-light border rounded">
+        <h4>Select a region on the map to see its trending movies.</h4>
+    </div>
+</div>
+
+    {{ map_data_json|json_script:"map_data"}}
+
+<script>
+    var map = L.map('map').setView([39.8283, -98.5795], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    var mapData = JSON.parse(document.getElementById('map-data').textContent);
+
+    mapData.forEach(function(data) {
+        var marker = L.marker([data.lat, data.lng]).addTo(map);
+        marker.bindTooltip("<b>" + data.region + " Region</b><br>Click to view trends");
+        marker.on('click', function() {
+            var infoBox = document.getElementById('region-info');
+            infoBox.innerHTML = "<h4>Trending in the " + data.region + "</h4>" +
+                                "<p class='lead'>" + data.trending + "</p>";
+        });
+    });
+</script>
+
+{% endblock content %}
