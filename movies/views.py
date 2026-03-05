@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
+from django.db.models import Sum, Count
+from cart.models import Item
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 
 def index(request):
@@ -69,3 +72,14 @@ def report_review(request, id, review_id):
         review.save()
         # review.delete()
     return redirect('movies.show', id=id)
+
+@staff_member_required
+def admin_analytics(request):
+    # --- Find the most purchased movie --- #
+    most_purchased_movie = (Item.objects.values("movie_id", "movie__name").annotate(total_bought=Sum("quantity")).order_by("-total_bought").first())
+    template_data = {}
+    template_data["most_purchased"] = most_purchased_movie
+    # --- Find the most reviewed movie --- #
+    most_reviewed_movie = (Review.objects.filter(reported=False).values("movie_id", "movie__name").annotate(total_reviews=Count("id")).order_by("-total_reviews").first())
+    template_data["most_reviewed"] = most_reviewed_movie
+    return render(request, 'movies/AdminAnalytics.html', {'template_data': template_data})
