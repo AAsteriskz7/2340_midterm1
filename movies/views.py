@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Review
 from django.contrib.auth.decorators import login_required
 from cart.models import Item
-import json
 
 def index(request):
     search_term = request.GET.get('search')
@@ -69,7 +68,6 @@ def report_review(request, id, review_id):
     if request.user != review.user:
         review.reported = True
         review.save()
-        # review.delete()
     return redirect('movies.show', id=id)
 
 def popularity_map(request):
@@ -117,5 +115,4 @@ def popularity_map(request):
                 'lng': lng,
                 'trending': movies_str
             })
-    map_data_json = json.dumps(map_data)
-    return render(request, 'movies/popularity_map.html', {'map_data_json': map_data_json})
+    return render(request, 'movies/popularity_map.html', {'map_data': map_data})
