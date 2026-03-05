@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto mb-3">
+        <h2>Most Purchased Movies and Most Reviewed Movies</h2>
+        <hr />
+      </div>
+    </div>
+    <div class="row m-1">
+        <h3>Most Purchased Movies</h3>
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Movie Name</th>
+            <th scope="col">Number of times bought</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ template_data.most_purchased.movie_id }}</td>
+            <td>{{ template_data.most_purchased.movie__name }}</td>
+            <td>{{ template_data.most_purchased.total_bought }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row m-1">
+        <h3>Most Reviewed Movies</h3>
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Movie Name</th>
+            <th scope="col">Number of times reviewed</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr>
+            <td>{{ template_data.most_reviewed.movie_id }}</td>
+            <td>{{ template_data.most_reviewed.movie__name }}</td>
+            <td>{{ template_data.most_reviewed.total_reviews }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock content %}
