@@ -47,6 +47,25 @@
         </tbody>
       </table>
     </div>
+    <div class="row m-1">
+      <h3>Users With The Most Reviews</h3>
+      <table class="table table-bordered table-striped text-center">
+        <thead>
+          <tr>
+            <th scope="col">User ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Number of reviews made</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ template_data.most_reviews_by_user.user_id }}</td>
+            <td>{{ template_data.most_reviews_by_user.user__username }}</td>
+            <td>{{ template_data.most_reviews_by_user.total_reviews }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 {% endblock content %}

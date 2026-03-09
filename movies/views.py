@@ -131,4 +131,13 @@ def admin_analytics(request):
     # --- Find the most reviewed movie --- #
     most_reviewed_movie = (Review.objects.filter(reported=False).values("movie_id", "movie__name").annotate(total_reviews=Count("id")).order_by("-total_reviews").first())
     template_data["most_reviewed"] = most_reviewed_movie
+    # --- Find the user with the most reviews --- #
+    most_reviews_by_user = (
+        Review.objects.filter(reported=False)
+        .values("user_id", "user__username")
+        .annotate(total_reviews=Count("id"))
+        .order_by("-total_reviews")
+        .first()
+    )
+    template_data["most_reviews_by_user"] = most_reviews_by_user
     return render(request, 'movies/AdminAnalytics.html', {'template_data': template_data})
