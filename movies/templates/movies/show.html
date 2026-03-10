@@ -9,6 +9,39 @@
         <hr />
         <p><b>Description:</b> {{ template_data.movie.description }}</p>
         <p><b>Price:</b> ${{ template_data.movie.price }}</p>
+
+        <!-- THUMBS UP THUMBS DOWN RATING -->
+        <div class ="mb-3">
+          <h5>Rate this movie:</h5>
+          {% if user.is_authenticated %}
+            <form method="post" action="">
+              {% csrf_token %}
+              <button type="submit" name="thumb" value="1" class="btn {% if template_data.user_rating and template_data.user_rating.thumb == 1 %}btn-success{% else %}btn-outline-success{% endif %}">
+                👍 Thumbs Up
+              </button>
+              <button type="submit" name="thumb" value="0" class="btn {% if template_data.user_rating and template_data.user_rating.thumb == 0 %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                👎 Thumbs Down
+              </button>
+            </form>
+            {% if template_data.user_rating %}
+              <div class="mt-2">
+                <b>Your rating:</b>
+                {% if template_data.user_rating.thumb == 1 %}👍 Thumbs Up{% else %}👎 Thumbs Down{% endif %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class = "alert alert-info">Log in to rate this movie.</div>
+          {% endif %}
+          <div class="mt-2">
+            <b>Thumbs Up:</b> {{ template_data.thumbs_up }} &nbsp; |&nbsp;
+            <b>Thumbs Down:</b> {{ template_data.thumbs_down }}
+            {% if template_data.percent_up is not None %}
+              <br><b>{{ template_data.percent_up }}%</b> thumbs up overall
+            {% endif %}
+          </div>
+        </div>
+        <!-- End Thumbs Up/Down Rating-->
+
         <p class="card-text">
           <form method="post" action="{% url 'cart.add' id=template_data.movie.id %}">
             <div class="row">

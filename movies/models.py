@@ -21,3 +21,13 @@ class Review(models.Model):
 
     def __str__(self):
         return str(self.id) + ' - ' + self.movie.name
+    
+class MovieRating(models.Model):
+    choicesRating = [(1, 'Thumbs Up'),(0, 'Thumbs Down')]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    thumb = models.IntegerField(choices=choicesRating)
+    class Meta:
+        unique_together = ('user', 'movie')
+    def __str__(self):
+        return f"{self.user.username} - {self.movie.name} - {'Up' if self.thumb else 'Down'}"

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Movie, Review
+from .models import Movie, Review, MovieRating
 from django.db.models import Sum, Count
 from cart.models import Item
 from django.contrib.admin.views.decorators import staff_member_required
@@ -22,10 +22,35 @@ def show(request, id):
     movie = Movie.objects.get(id=id)
     reviews = Review.objects.filter(movie=movie, reported=False)
 
+    user_rating = None
+    if request.user.is_authenticated:
+        user_rating = MovieRating.objects.filter(user=request.user, movie=movie).first()
+
+    if request.method == 'POST' and request.user.is_authenticated:
+        thumb = int(request.POST.get('thumb', -1))
+        if thumb in [0, 1]:
+            rating, created = MovieRating.objects.update_or_create(
+                user=request.user, movie=movie,
+                defaults={'thumb': thumb}
+            )
+            user_rating = rating
+
+    thumbs_up = MovieRating.objects.filter(movie=movie, thumb=1).count()
+    thumbs_down = MovieRating.objects.filter(movie=movie, thumb=0).count()
+    total = thumbs_up + thumbs_down
+    if total > 0:
+        percent_up = int(thumbs_up / total * 100)
+    else:
+        percent_up = None
+
     template_data = {}
     template_data['title'] = movie.name
     template_data['movie'] = movie
     template_data['reviews'] = reviews
+    template_data['user_rating'] = user_rating
+    template_data['thumbs_up'] = thumbs_up
+    template_data['thumbs_down'] = thumbs_down
+    template_data['percent_up'] = percent_up
     return render(request, 'movies/show.html', {'template_data': template_data})
 
 @login_required
