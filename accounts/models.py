@@ -8,3 +8,11 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username + " - " +  self.region
+    
+
+class UserProxy(User): 
+    class Meta:
+        proxy = True
+        app_label = 'accounts'
+        verbose_name = 'User Purchase'
+        verbose_name_plural = 'User Purchases'
